@@ -57,7 +57,7 @@ pip install -r requirements.txt
 ```powershell
 streamlit run streamlit_app.py
 ```
-Or use CLI: `python cli.py` | Desktop GUI: `python main.py`
+Or use CLI: `python cli.py`
 
 ---
 
@@ -98,13 +98,12 @@ See **[WORK.md](WORK.md)** for the complete 100+ command reference.
 D:\AI_AGENT/
 ├── streamlit_app.py     # Web UI (recommended)
 ├── cli.py               # Command-line interface
-├── main.py              # PySide6 desktop app
 ├── requirements.txt     # All dependencies
 ├── .env                 # Your API key
 ├── README.md            # This file
 ├── WORK.md              # Full documentation
 ├── agent/               # Core orchestration
-├── tools/               # 15 automation tools
+├── tools/               # 16 automation tools
 ├── memory/              # Memory & RAG systems
 ├── database/            # SQLite storage
 ├── config/              # Settings
@@ -151,9 +150,8 @@ See [WORK.md §3 — Fast Path System](WORK.md#3-fast-path-system-speed-optimiza
 ## 📄 License
 
 Open source. Built by **Aryan Chavan (ArynoxTech)**.  
-Python 3.13+ | Groq API | Streamlit | PySide6 | SQLite | scikit-learn | OpenCV
+Python 3.13+ | Groq API | Streamlit | SQLite | scikit-learn | OpenCV
 
 ---
 
 **Full documentation:** [WORK.md](WORK.md)
-"# Arynoxtech_AI_AGENT" 

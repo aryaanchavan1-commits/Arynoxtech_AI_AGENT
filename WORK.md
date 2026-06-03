@@ -27,13 +27,10 @@ streamlit run D:\AI_AGENT\streamlit_app.py
 ```
 Opens at `http://localhost:8501` — the multi-tab web interface.
 
-### Alternative Launches
+### Alternative Launch
 ```powershell
 # CLI mode
 python cli.py
-
-# Desktop app (PySide6)
-python main.py
 ```
 
 ---
@@ -676,4 +673,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ---
 
 **Built by Aryan Chavan (ArynoxTech)**  
-Python 3.13+ | Groq API | Streamlit | PySide6 | SQLite | scikit-learn | OpenCV | OpenPyXL | ReportLab | Matplotlib
+Python 3.13+ | Groq API | Streamlit | SQLite | scikit-learn | OpenCV | OpenPyXL | ReportLab | Matplotlib
