@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+logs/
+database/*.db
+data/
+reports/
+assets/captures/
+assets/reports/
+assets/uploads/
+models/ml_models/
+.DS_Store
+*.swp
+*.swo

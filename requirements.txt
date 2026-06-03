@@ -1,0 +1,92 @@
+# ArynoxTech AI Agent - Dependencies
+# Python 3.13
+
+# GUI Framework
+PySide6
+
+# Data Processing
+pandas
+numpy
+
+# Excel Operations
+openpyxl
+
+# PDF Processing
+PyPDF2
+
+# HTTP Client
+requests
+
+# Groq API
+groq
+
+# Voice Recognition
+SpeechRecognition
+pyaudio
+
+# Text-to-Speech
+pyttsx3
+
+# Async Support
+aiohttp
+aiofiles
+
+# Database
+aiosqlite
+
+# Web Browser Automation (Optional - only when needed)
+selenium
+
+# Task Scheduling
+schedule
+
+# Monitoring
+psutil
+
+# Type Checking
+typing-extensions
+
+# Environment Config
+python-dotenv
+
+# File Watching
+watchdog
+
+# Web Scraping & Search
+beautifulsoup4
+
+# Streamlit GUI
+streamlit
+
+# --- Desktop Automation ---
+pyautogui
+
+# --- Camera / Webcam ---
+opencv-python-headless
+opencv-contrib-python
+
+# --- ML Engineer & Statistics ---
+statsmodels
+scikit-learn
+scipy
+
+# --- Database (Multi-Engine) ---
+aiosqlite
+psycopg2-binary
+pymysql
+
+# --- Reporting & Templates ---
+reportlab
+matplotlib
+Pillow
+jinja2
+PyYAML
+
+# --- RAG / Semantic Memory ---
+sentence-transformers
+rank-bm25
+torch
+
+# --- Document Processing ---
+python-docx
+pytesseract
