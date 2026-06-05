@@ -90,7 +90,8 @@ huggingface-cli download HuggingFaceTB/SmolLM2-1.7B-Instruct --local-dir D:\AI_A
 2. Click "Files and versions"
 3. Download ALL `.safetensors` files, `config.json`, `tokenizer.json`, etc.
 4. Place them in `D:\AI_AGENT\models\<model-name>\`
-
+** OR Download model from:**
+   link :- https://drive.google.com/drive/folders/1M-mTgaALK1nFANCY6K2qy91GcdSWRORZ?usp=sharing
 **Note for Windows (page file <8GB):** Models over ~2.5GB in a single `.safetensors` file may fail to load due to Windows mmap limitations. The agent handles this automatically — shards large files into <2GB shards on first load.
 
 #### Step 2: Configure .env for offline mode
