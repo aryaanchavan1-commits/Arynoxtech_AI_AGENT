@@ -1,9 +1,6 @@
 # ArynoxTech AI Agent - Dependencies
 # Python 3.13
 
-# GUI Framework
-PySide6
-
 # Data Processing
 pandas
 numpy
@@ -20,7 +17,11 @@ requests
 # Groq API (Online mode)
 groq
 
-# Local LLM (Offline mode) — uses transformers + torch (already included above)
+# Local LLM (Offline mode) — Hugging Face transformers + 4-bit quantization
+transformers
+bitsandbytes
+safetensors
+accelerate
 
 # Voice Recognition
 SpeechRecognition
@@ -64,7 +65,6 @@ streamlit
 pyautogui
 
 # --- Camera / Webcam ---
-opencv-python-headless
 opencv-contrib-python
 
 # --- ML Engineer & Statistics ---

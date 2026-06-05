@@ -156,12 +156,9 @@ class AgentCore:
                 return
         except Exception:
             loop = None
-        try:
-            logger.info("Event loop not running yet; scheduling worker start via QTimer")
-            from PySide6.QtCore import QTimer
-            QTimer.singleShot(1000, self.start_task_worker)
-        except Exception as e:
-            logger.warning(f"Could not start task worker (no event loop): {e}")
+        import threading
+        logger.info("Event loop not running yet; scheduling worker start via threading.Timer")
+        threading.Timer(1.0, self.start_task_worker).start()
 
     # ── Model Connection ─────────────────────────────────────────────────
 
