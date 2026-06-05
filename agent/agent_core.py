@@ -463,10 +463,11 @@ class AgentCore:
             self._finish(user_input, response)
             return response
 
-        except ModelNotAvailableError:
+        except RuntimeError:
             error_msg = (
-                "⚠️ Groq API is not available.\n\n"
-                "Please set the GROQ_API_KEY environment variable with your Groq API key."
+                "⚠️ No LLM backend available.\n\n"
+                "• Set **GROQ_API_KEY** in `.env` for online mode, OR\n"
+                "• Set `LOCAL_MODEL_ENABLED=1` and `LOCAL_MODEL_PATH` in `.env` for offline mode"
             )
             if self._on_error:
                 self._on_error(error_msg)
