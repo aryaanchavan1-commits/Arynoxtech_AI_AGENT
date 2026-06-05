@@ -68,8 +68,11 @@ class WebSearchTool(BaseTool):
     def llm(self):
         """Lazy import LLM client for content filtering."""
         if self._llm is None:
-            from utils.llama_client import LlamaClient
-            self._llm = LlamaClient()
+            try:
+                from utils.llm_factory import get_llm_client
+                self._llm = get_llm_client()
+            except Exception:
+                self._llm = None
         return self._llm
 
     async def execute(self, **kwargs: Any) -> ToolResult:

@@ -104,15 +104,16 @@ class TaskManager:
     queuing, concurrent execution, monitoring, and cleanup.
     """
 
-    def __init__(self, tool_registry: Optional[ToolRegistry] = None) -> None:
+    def __init__(self, tool_registry: Optional[ToolRegistry] = None, llm_client=None) -> None:
         """
         Initialize the task manager.
 
         Args:
             tool_registry: Tool registry for executing steps
+            llm_client: Optional LLM client (passed from AgentCore)
         """
         self.tool_registry = tool_registry or ToolRegistry()
-        self.planner = Planner()
+        self.planner = Planner(llm_client=llm_client)
         self._tasks: Dict[str, Task] = {}
         self._queue: asyncio.Queue = asyncio.Queue()
         self._running_tasks: Set[str] = set()

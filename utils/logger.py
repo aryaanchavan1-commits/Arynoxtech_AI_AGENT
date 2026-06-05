@@ -73,9 +73,28 @@ class LoggerFactory:
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)
 
-        # Console handler
+        # Console handler (safe for Windows cp1252 terminal)
         if LOGGING_CONFIG["console_output"]:
-            console_handler = logging.StreamHandler(sys.stdout)
+
+            class SafeStreamHandler(logging.StreamHandler):
+                """Handler that replaces unencodable Unicode chars for Windows console."""
+
+                def emit(self, record):
+                    try:
+                        super().emit(record)
+                    except UnicodeEncodeError:
+                        msg = self.format(record)
+                        safe = msg.encode("utf-8", errors="replace").decode(
+                            "utf-8", errors="replace"
+                        )
+                        try:
+                            stream = self.stream
+                            stream.write(safe + self.terminator)
+                            self.flush()
+                        except Exception:
+                            self.handleError(record)
+
+            console_handler = SafeStreamHandler(sys.stdout)
             console_handler.setLevel(log_level)
             console_formatter = logging.Formatter(
                 "%(asctime)s | %(levelname)-8s | %(message)s",

@@ -9,7 +9,8 @@ reports/
 assets/captures/
 assets/reports/
 assets/uploads/
-models/ml_models/
+models/
+!models/.gitkeep
 .DS_Store
 *.swp
 *.swo

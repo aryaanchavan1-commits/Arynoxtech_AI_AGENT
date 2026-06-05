@@ -39,7 +39,7 @@ from tools.business_utils import BusinessUtilsTool
 from memory.short_term_memory import ShortTermMemory
 from memory.long_term_memory import LongTermMemory
 from memory.semantic_memory import SemanticMemory
-from utils.llama_client import LlamaClient, ModelNotAvailableError
+from utils.llm_factory import get_llm_factory, LLMMode
 from utils.logger import get_logger
 from config.settings import SECURITY_CONFIG
 from memory.rag_retrieval import RAGRetriever
@@ -67,8 +67,14 @@ class AgentCore:
         if self._initialized:
             return
 
-        # Initialize LLM
-        self.llm = LlamaClient()
+        # Initialize LLM via factory (auto-detects online/offline)
+        self._llm_factory = get_llm_factory()
+        self.llm_mode = self._llm_factory.detect_mode()
+        if self.llm_mode != LLMMode.UNAVAILABLE:
+            self.llm = self._llm_factory.get_client()
+        else:
+            self.llm = None
+        self._model_connected = self.llm_mode != LLMMode.UNAVAILABLE
 
         # Initialize memory systems
         self.short_term_memory = ShortTermMemory()
@@ -81,7 +87,7 @@ class AgentCore:
 
         # Initialize planner and task manager
         self.planner = Planner(self.llm)
-        self.task_manager = TaskManager(self.tool_registry)
+        self.task_manager = TaskManager(self.tool_registry, llm_client=self.llm)
         self.task_manager.set_task_update_callback(self._on_task_update)
 
         # Agent state
@@ -160,18 +166,35 @@ class AgentCore:
     # ── Model Connection ─────────────────────────────────────────────────
 
     def check_model_connection(self) -> bool:
-        """Check if Groq API is available."""
-        self._model_connected = self.llm.check_connection()
+        """Check if any LLM backend (online or offline) is available."""
+        mode = self._llm_factory.detect_mode()
+        self._model_connected = mode != LLMMode.UNAVAILABLE
+        self.llm_mode = mode
+        if self._model_connected:
+            try:
+                self.llm = self._llm_factory.get_client()
+            except RuntimeError:
+                pass
         return self._model_connected
 
     def wait_for_model(self, timeout: int = 60) -> bool:
-        """Wait for Groq API to become available."""
-        self._model_connected = self.llm.wait_for_server(timeout_seconds=timeout)
-        return self._model_connected
+        """Wait for any LLM backend to become available."""
+        import time
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.check_model_connection():
+                return True
+            time.sleep(2)
+        return False
 
     @property
     def is_model_connected(self) -> bool:
         return self._model_connected
+
+    @property
+    def current_llm_mode(self) -> str:
+        """Returns 'online' or 'offline' or 'unavailable'."""
+        return self._llm_factory.mode_name
 
     # ── Helper: execute a single-step plan ───────────────────────────────
 
@@ -346,25 +369,6 @@ class AgentCore:
                 self._finish(user_input, response)
                 return response
 
-            # ═══════════════════════════════════════════════════════════════
-            # FAST PATH 7b: Business utility commands
-            # ═══════════════════════════════════════════════════════════════
-            if any(normalized.startswith(p) for p in ["data quality", "quality report", "quality check"]):
-                response = await self._run_plan_step("business_utils_tool", {"action": "data_quality_report"}, "data quality report")
-                self._finish(user_input, response)
-                return response
-            if any(normalized.startswith(p) for p in ["profile data", "data profiling"]):
-                response = await self._run_plan_step("business_utils_tool", {"action": "data_profiling"}, "data profiling")
-                self._finish(user_input, response)
-                return response
-            if "pii" in normalized:
-                response = await self._run_plan_step("business_utils_tool", {"action": "pii_detection"}, "PII detection")
-                self._finish(user_input, response)
-                return response
-            if "compliance" in normalized:
-                response = await self._run_plan_step("business_utils_tool", {"action": "compliance_check"}, "compliance check")
-                self._finish(user_input, response)
-                return response
             if any(normalized.startswith(p) for p in ["forecast", "forecasting", "predict future"]):
                 response = await self._run_plan_step("data_analysis_tool", {"action": "forecasting"}, "forecasting")
                 self._finish(user_input, response)
@@ -757,6 +761,7 @@ class AgentCore:
             conversation_context=conversation_context,
             temperature=0.7,
         )
+
         return response
 
     # ── Task Management ──────────────────────────────────────────────────
@@ -787,6 +792,7 @@ class AgentCore:
         """Get comprehensive system status information."""
         status = {
             "model_connected": self._model_connected,
+            "llm_mode": self.current_llm_mode,
             "processing": self._processing,
             "memory_usage": {
                 "short_term_count": self.short_term_memory.message_count,

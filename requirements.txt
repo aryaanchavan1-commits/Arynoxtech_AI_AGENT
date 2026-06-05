@@ -17,8 +17,10 @@ PyPDF2
 # HTTP Client
 requests
 
-# Groq API
+# Groq API (Online mode)
 groq
+
+# Local LLM (Offline mode) — uses transformers + torch (already included above)
 
 # Voice Recognition
 SpeechRecognition

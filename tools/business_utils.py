@@ -72,7 +72,7 @@ class BusinessUtilsTool(BaseTool):
     anomaly detection, schema inference, and dataset merging.
     """
 
-    name: str = "business_utils"
+    name: str = "business_utils_tool"
     description: str = (
         "Business data utilities: quality reports, schema validation, "
         "profiling, PII detection, compliance checks, anomaly detection, "

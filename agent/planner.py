@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from utils.llama_client import LlamaClient
+from utils.llm_factory import get_llm_client
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -104,14 +104,20 @@ class Planner:
     them into tool-driven steps using Groq LLM.
     """
 
-    def __init__(self, llm_client: Optional[LlamaClient] = None) -> None:
+    def __init__(self, llm_client=None) -> None:
         """
         Initialize the planner.
 
         Args:
-            llm_client: Optional Groq client instance
+            llm_client: Optional LLM client instance
         """
-        self.llm = llm_client or LlamaClient()
+        self.llm = llm_client
+        if self.llm is None:
+            from utils.llm_factory import get_llm_client as factory_client
+            try:
+                self.llm = factory_client()
+            except RuntimeError:
+                self.llm = None
         self._planning_prompt_template = self._build_planning_prompt()
 
     def _build_planning_prompt(self) -> str:

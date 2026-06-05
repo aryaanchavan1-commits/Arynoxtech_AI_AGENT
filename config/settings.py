@@ -10,7 +10,14 @@ All paths, model settings, and application constants are defined here.
 
 import os
 from pathlib import Path
-from typing import Final, Dict, Any
+from typing import Final, Dict, Any, Optional
+
+# Fix OpenBLAS / MKL memory allocation errors (especially on Windows)
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
 
 from dotenv import load_dotenv
 
@@ -49,6 +56,16 @@ LLM_CONFIG: Final[Dict[str, Any]] = {
     "top_p": 0.95,
     "stream": False,
 }
+
+# ── Local / Offline Model Configuration ──────────────────────────────────────
+LOCAL_MODEL_ENABLED: Final[bool] = os.getenv("LOCAL_MODEL_ENABLED", "0") == "1"
+LOCAL_MODEL_PATH: Final[str] = os.getenv("LOCAL_MODEL_PATH", str(BASE_DIR / "models" / "local-model.gguf"))
+LOCAL_MODEL_N_CTX: Final[int] = int(os.getenv("LOCAL_MODEL_N_CTX", "2048"))
+LOCAL_MODEL_N_THREADS: Final[int] = int(os.getenv("LOCAL_MODEL_N_THREADS", "4"))
+LOCAL_MODEL_MAX_TOKENS: Final[int] = int(os.getenv("LOCAL_MODEL_MAX_TOKENS", "512"))
+LOCAL_MODEL_TEMPERATURE: Final[float] = float(os.getenv("LOCAL_MODEL_TEMPERATURE", "0.7"))
+LOCAL_MODEL_TOP_P: Final[float] = float(os.getenv("LOCAL_MODEL_TOP_P", "0.95"))
+LOCAL_MODEL_GPU_LAYERS: Final[int] = int(os.getenv("LOCAL_MODEL_GPU_LAYERS", "0"))
 
 # ── Application Settings ───────────────────────────────────────────────────
 APP_CONFIG: Final[Dict[str, Any]] = {

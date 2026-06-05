@@ -22,6 +22,7 @@ from utils.logger import LoggerFactory
 LoggerFactory.initialize()
 from agent.agent_core import AgentCore
 from config.settings import LLM_CONFIG, BASE_DIR
+from utils.llm_factory import get_llm_factory, LLMMode
 
 HISTORY_DIR = BASE_DIR / "data" / "history"
 HISTORY_DIR.mkdir(parents=True, exist_ok=True)
@@ -97,18 +98,25 @@ div[data-testid="stButton"] button{border-radius:6px!important}
 .badge{background:#ff9800;color:#fff;border-radius:8px;padding:0 6px;font-size:10px;margin-left:4px}
 </style>""", unsafe_allow_html=True)
 
-# ── API Check ─────────────────────────────────────────────────────────────────
-if not LLM_CONFIG.get("api_key"):
-    st.error("⚠️ GROQ_API_KEY not found.")
-    st.stop()
-
 # ── Init Agent (once) ────────────────────────────────────────────────────────
 if "agent" not in st.session_state:
     with st.spinner("Initializing..."):
         agent = AgentCore()
-        if not agent.check_model_connection():
-            st.error("Cannot connect to Groq API.")
-            st.stop()
+        connected = agent.check_model_connection()
+        if not connected:
+            llm_factory = get_llm_factory()
+            mode = llm_factory.detect_mode()
+            if mode == LLMMode.UNAVAILABLE:
+                st.error(
+                    "⚠️ No LLM backend available.\n\n"
+                    "• Set **GROQ_API_KEY** in `.env` for online mode\n"
+                    "• OR enable offline mode by:\n"
+                    "  1. Setting `LOCAL_MODEL_ENABLED=1` in `.env`\n"
+                    "  2. Downloading a Hugging Face model (e.g., SmolLM2-1.7B, TinyLlama-1.1B)\n"
+                    "  3. Setting `LOCAL_MODEL_PATH=path/to/model-folder` in `.env`\n\n"
+                    "See README.md for detailed offline setup instructions."
+                )
+                st.stop()
         st.session_state.agent = agent
 
 # ── Tab data model ────────────────────────────────────────────────────────────
@@ -280,6 +288,18 @@ if st.session_state.show_history:
 with st.sidebar:
     st.markdown("**🤖 ArynoxTech**")
     st.caption(f"`{_tab()['name']}` - {len(_tab()['messages'])} msgs")
+
+    # ── LLM Mode Indicator ──────────────────────────────────────────────────
+    if "agent" in st.session_state:
+        mode_name = st.session_state.agent.current_llm_mode
+        if "Online" in mode_name:
+            st.success(f"✅ **Online** — Groq API")
+        elif "Offline" in mode_name:
+            st.info(f"💻 **Offline** — Local Model")
+        else:
+            st.error(f"❌ **Unavailable**")
+    else:
+        st.warning("⏳ Initializing...")
 
     if _tab()["task_names"]:
         st.info(f"⏳ Running: {', '.join(_tab()['task_names'])}")
