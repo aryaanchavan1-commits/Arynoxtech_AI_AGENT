@@ -123,8 +123,7 @@ LOCAL_MODEL_PATH=D:\AI_AGENT\models\SmolLM2-1.7B-Instruct
 ```powershell
 streamlit run streamlit_app.py
 ```
-
-The UI will show **"Offline — Local Model"** in the sidebar. Everything works the same — no internet needed!
+Or use CLI: `python cli.py`
 
 ---
 
@@ -193,24 +192,15 @@ D:\AI_AGENT/
 ├── streamlit_app.py     # Web UI (recommended)
 ├── cli.py               # Command-line interface
 ├── requirements.txt     # All dependencies
-├── .env                 # API key + offline config
+├── .env                 # Your API key
 ├── README.md            # This file
 ├── WORK.md              # Full documentation
 ├── agent/               # Core orchestration
-│   ├── agent_core.py    # Main agent logic (dual-mode LLM)
-│   ├── planner.py       # Task planning
-│   └── task_manager.py  # Task execution
 ├── tools/               # 16 automation tools
 ├── memory/              # Memory & RAG systems
 ├── database/            # SQLite storage
-├── config/              # Settings (OpenBLAS fix included)
-│   └── settings.py      # All config + local model settings
-├── utils/
-│   ├── llama_client.py  # Groq API client (online)
-│   ├── local_llm_client.py  # Hugging Face model client (offline)
-│   └── llm_factory.py   # Auto-detection & switching
-├── models/
-│   └── SmolLM2-1.7B-Instruct/  # Your downloaded model folder goes here
+├── config/              # Settings
+├── models/ml_models/    # Trained ML models
 ├── reports/             # Generated reports
 └── assets/captures/     # Camera photos/videos
 ```
@@ -254,8 +244,8 @@ See [WORK.md Section 3 — Fast Path System](WORK.md#3-fast-path-system-speed-op
 
 ## License
 
-Open source. Built by **Aryan Chavan (ArynoxTech)**.
-Python 3.13+ | Groq API | transformers + PyTorch | Streamlit | SQLite | scikit-learn | OpenCV
+Open source. Built by **Aryan Chavan (ArynoxTech)**.  
+Python 3.13+ | Groq API | Streamlit | SQLite | scikit-learn | OpenCV
 
 ---
 
