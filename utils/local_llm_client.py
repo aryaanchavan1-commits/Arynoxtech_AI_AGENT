@@ -81,6 +81,7 @@ class LocalLLMClient:
 
             path = Path(self.model_path)
             model_id = str(path) if path.exists() else self.model_path
+            is_local = path.exists()
 
             # Use 4-bit if GPU VRAM < 8GB (fits RTX 3050 4GB)
             vram_gb = 0
@@ -112,13 +113,18 @@ class LocalLLMClient:
                     "low_cpu_mem_usage": True,
                 }
 
-            self._tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+            self._tokenizer = AutoTokenizer.from_pretrained(
+                model_id,
+                trust_remote_code=True,
+                local_files_only=is_local,
+            )
             if self._tokenizer.pad_token is None:
                 self._tokenizer.pad_token = self._tokenizer.eos_token
 
             self._model = AutoModelForCausalLM.from_pretrained(
                 model_id,
                 trust_remote_code=True,
+                local_files_only=is_local,
                 **model_kwargs,
             )
 

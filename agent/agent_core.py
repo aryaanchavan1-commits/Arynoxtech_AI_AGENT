@@ -726,25 +726,32 @@ class AgentCore:
         """Generate a response using the LLM with conversation context."""
         # Optional RAG context (dense+sparse+rerank) from ingested documents.
         # Best-effort: if dependencies aren't available, it returns empty.
+        # In offline mode, skip dense RAG to avoid HuggingFace download hangs.
         rag_context = ""
         try:
-            retriever = getattr(self, "_rag_retriever", None)
-            if retriever is None:
-                self._rag_retriever = RAGRetriever()
-                retriever = self._rag_retriever
-
-            # Fetch a larger candidate set from DB by lexical search.
-            # We then rerank in-memory.
-            candidate_rows = self.semantic_memory.search(user_input, limit=40)
-            chunks = [
-                {"content": r.get("content", ""), "metadata": r.get("metadata", {})}
-                for r in candidate_rows
-                if isinstance(r.get("content"), str)
-            ]
-            ranked = retriever.retrieve(user_input, chunks, top_k_dense=20, top_k_sparse=20, top_k_final=6)
-            if ranked:
-                rag_context = "\n".join([f"- {r.content[:500]}" for r in ranked])
-                rag_context = f"[RAG retrieved chunks]\n{rag_context}"
+            if self.llm_mode == LLMMode.OFFLINE:
+                candidate_rows = self.semantic_memory.search(user_input, limit=10)
+                if candidate_rows:
+                    rag_context = "\n".join(
+                        [f"- {r.get('content', '')[:300]}" for r in candidate_rows if isinstance(r.get("content"), str)]
+                    )
+                    rag_context = f"[Relevant memories]\n{rag_context}"
+            else:
+                retriever = getattr(self, "_rag_retriever", None)
+                if retriever is None:
+                    self._rag_retriever = RAGRetriever()
+                    retriever = self._rag_retriever
+                if retriever is not None:
+                    candidate_rows = self.semantic_memory.search(user_input, limit=40)
+                    chunks = [
+                        {"content": r.get("content", ""), "metadata": r.get("metadata", {})}
+                        for r in candidate_rows
+                        if isinstance(r.get("content"), str)
+                    ]
+                    ranked = retriever.retrieve(user_input, chunks, top_k_dense=20, top_k_sparse=20, top_k_final=6)
+                    if ranked:
+                        rag_context = "\n".join([f"- {r.content[:500]}" for r in ranked])
+                        rag_context = f"[RAG retrieved chunks]\n{rag_context}"
         except Exception:
             rag_context = ""
 

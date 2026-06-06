@@ -35,8 +35,13 @@ packages are missing, dense/sparse/rerank fall back gracefully.
 from __future__ import annotations
 
 import math
+import os
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+
+# Prevent HuggingFace download retries when offline
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
 
 @dataclass
@@ -86,14 +91,17 @@ class RAGRetriever:
         self.cross_encoder_model = cross_encoder_model
         self.rerank_top_k = rerank_top_k
 
-        # Dense setup
+        # Dense setup - use local_files_only to avoid hanging on download
         self._st = _try_import("sentence_transformers")
         self._sentence_model = None
         if self._st is not None:
             try:
                 from sentence_transformers import SentenceTransformer  # type: ignore
 
-                self._sentence_model = SentenceTransformer(self.dense_model_name)
+                self._sentence_model = SentenceTransformer(
+                    self.dense_model_name,
+                    local_files_only=True,
+                )
             except Exception:
                 self._sentence_model = None
 
@@ -101,7 +109,7 @@ class RAGRetriever:
         self._rank_bm25 = _try_import("rank_bm25")
         self._bm25 = None
 
-        # Rerank setup
+        # Rerank setup - local_files_only to avoid hanging on download
         self._cross = None
         if self.cross_encoder_model:
             self._transformers = _try_import("transformers")
@@ -109,8 +117,14 @@ class RAGRetriever:
                 try:
                     from transformers import AutoTokenizer, AutoModelForSequenceClassification  # type: ignore
 
-                    tok = AutoTokenizer.from_pretrained(self.cross_encoder_model)
-                    mdl = AutoModelForSequenceClassification.from_pretrained(self.cross_encoder_model)
+                    tok = AutoTokenizer.from_pretrained(
+                        self.cross_encoder_model,
+                        local_files_only=True,
+                    )
+                    mdl = AutoModelForSequenceClassification.from_pretrained(
+                        self.cross_encoder_model,
+                        local_files_only=True,
+                    )
                     self._cross = (tok, mdl)
                 except Exception:
                     self._cross = None
