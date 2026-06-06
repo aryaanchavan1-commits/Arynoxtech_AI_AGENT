@@ -140,7 +140,8 @@ class Planner:
             "- app_automation_tool: Social media (Instagram/FB/WhatsApp), web automation\n"
             "- document_ingestion_tool: Ingest files into searchable memory storage\n"
             "- camera_tool: Take photos, record video, detect objects/faces, recognize people\n"
-            "- ml_tool: Train ML models, predict, evaluate, preprocess data, feature engineering\n\n"
+            "- ml_tool: Train ML models, predict, evaluate, preprocess data, feature engineering\n"
+            "- tally_tool: Tally ERP integration for ledgers, groups, stock items, vouchers, balance sheet, P&L, trial balance, day book, outstandings, export to Excel\n\n"
             "Output format (JSON only, no other text):\n"
             "{\n"
             '  "steps": [\n'
@@ -378,7 +379,12 @@ class Planner:
         ]):
             return "ml_tool"
 
-        if any(word in desc_lower for word in ["excel", "sheet", "spreadsheet", "gst", "inventory"]):
+        if any(word in desc_lower for word in ["tally", "ledger", "voucher", "balance sheet",
+            "profit and loss", "trial balance", "day book", "outstanding",
+            "stock item", "stock group", "cost centre", "godown",
+        ]):
+            return "tally_tool"
+        elif any(word in desc_lower for word in ["excel", "sheet", "spreadsheet", "gst", "inventory"]):
             return "excel_tool"
         elif any(word in desc_lower for word in ["data quality", "quality report", "profile data", "schema validation",
             "pii detect", "compliance", "anomaly detect", "merge dataset", "merge data",
@@ -534,6 +540,48 @@ class Planner:
 
         elif tool_name == "data_analysis_tool":
             params["action"] = "analyze"
+
+        elif tool_name == "tally_tool":
+            if "ledger" in lowered and ("list" in lowered or "get" in lowered or "show" in lowered or "all" in lowered):
+                params["action"] = "get_ledgers"
+            elif "group" in lowered and ("list" in lowered or "get" in lowered or "show" in lowered or "all" in lowered):
+                params["action"] = "get_groups"
+            elif "balance sheet" in lowered:
+                params["action"] = "get_balance_sheet"
+            elif "profit" in lowered or "p&l" in lowered:
+                params["action"] = "get_profit_loss"
+            elif "trial" in lowered:
+                params["action"] = "get_trial_balance"
+            elif "day book" in lowered or "daybook" in lowered:
+                params["action"] = "get_day_book"
+            elif "outstanding" in lowered:
+                params["action"] = "get_outstandings"
+            elif "stock item" in lowered or "stock items" in lowered:
+                params["action"] = "get_stock_items"
+            elif "stock group" in lowered or "stock groups" in lowered:
+                params["action"] = "get_stock_groups"
+            elif "voucher" in lowered:
+                params["action"] = "get_vouchers"
+            elif "cost centre" in lowered:
+                params["action"] = "get_cost_centres"
+            elif "godown" in lowered:
+                params["action"] = "get_godowns"
+            elif "excel" in lowered or "export" in lowered:
+                params["action"] = "export_to_excel"
+                if "ledger" in lowered:
+                    params["export_action"] = "ledgers"
+                elif "balance" in lowered:
+                    params["export_action"] = "balance_sheet"
+                elif "profit" in lowered:
+                    params["export_action"] = "profit_loss"
+                elif "trial" in lowered:
+                    params["export_action"] = "trial_balance"
+                elif "stock" in lowered:
+                    params["export_action"] = "stock_summary"
+            elif "check" in lowered or "connect" in lowered:
+                params["action"] = "check_connection"
+            else:
+                params["action"] = "check_connection"
 
         elif tool_name == "personal_assistant_tool":
             if "remind" in lowered or "reminder" in lowered:

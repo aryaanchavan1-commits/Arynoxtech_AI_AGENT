@@ -77,6 +77,15 @@ class AgentCore:
             self.llm = None
         self._model_connected = self.llm_mode != LLMMode.UNAVAILABLE
 
+        # Preload local model at startup so first response is fast
+        if self.llm_mode == LLMMode.OFFLINE and self.llm is not None:
+            try:
+                if hasattr(self.llm, "_ensure_loaded"):
+                    logger.info("Preloading local model at startup...")
+                    self.llm._ensure_loaded()
+            except Exception:
+                logger.warning("Could not preload local model, will load on demand")
+
         # Initialize memory systems
         self.short_term_memory = ShortTermMemory()
         self.long_term_memory = LongTermMemory()
@@ -455,7 +464,19 @@ class AgentCore:
                 "trial balance", "day book", "outstanding", "stock item",
                 "stock group", "cost centre", "godown", "accounting",
             ]
-            looks_tool_request = any(k in normalized for k in tool_keywords)
+            # In offline mode, exclude web-dependent keywords so general
+            # questions go directly to the local LLM instead of failing.
+            if self.llm_mode == LLMMode.OFFLINE:
+                _web_only = {"website", "browser", "open url", "http", "search",
+                             "google", "look up", "find online", "what is", "who is",
+                             "news", "latest", "real-time", "current", "weather",
+                             "definition", "meaning", "information about"}
+                if not any(k in normalized for k in tool_keywords if k not in _web_only):
+                    looks_tool_request = False
+                else:
+                    looks_tool_request = any(k in normalized for k in tool_keywords)
+            else:
+                looks_tool_request = any(k in normalized for k in tool_keywords)
 
             if looks_tool_request:
                 task = await self.task_manager.create_task(description=user_input)
