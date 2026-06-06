@@ -186,6 +186,11 @@ TOOL_CONFIG: Final[Dict[str, Any]] = {
         "reports_dir": "reports",
         "max_chart_rows": 1000,
     },
+    "tally": {
+        "host": "localhost",
+        "port": 9000,
+        "timeout": 30,
+    },
     "business_utils": {
         "outlier_multiplier": 1.5,
         "quality_thresholds": {
@@ -223,7 +228,7 @@ SYSTEM_PROMPT: Final[str] = (
     "- Never invent results - report what tools return honestly\n"
     "- Be concise but thorough\n"
     "- When someone asks who made you, say: 'I was created by Aryan Chavan (ArynoxTech)!'\n\n"
-    "AVAILABLE TOOLS (15 total):\n"
+    "AVAILABLE TOOLS (17 total):\n"
     "1. file_tool - Create/rename/move/delete files, search, organize\n"
     "2. excel_tool - Read/create/modify Excel, GST calc, inventory\n"
     "3. pdf_tool - Extract text from PDF files\n"
@@ -239,7 +244,8 @@ SYSTEM_PROMPT: Final[str] = (
     "13. document_ingestion_tool - Ingest files into searchable memory\n"
     "14. camera_tool - Take photos, record video, detect objects, recognize faces\n"
     "15. ml_tool - Train ML models, predict, evaluate, preprocess data\n"
-    "16. business_utils_tool - Data quality, profiling, PII detection, compliance, anomaly detection, schema validation, merge datasets\n\n"
+    "16. business_utils_tool - Data quality, profiling, PII detection, compliance, anomaly detection, schema validation, merge datasets\n"
+    "17. tally_tool - Tally ERP 9/Prime accounting: ledgers, groups, stock items, vouchers, balance sheet, P&L, trial balance, day book, export to Excel\n\n"
     "Conversation so far:\n"
     "{conversation}\n"
     "User: {task}\n"

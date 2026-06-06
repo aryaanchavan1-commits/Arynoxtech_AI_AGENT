@@ -350,7 +350,7 @@ with st.sidebar:
 
     st.markdown("**🛠️ Tools**")
     for t in ["Excel","File","PDF","Browser","System","Database","Web Search","Data Analysis","Data Entry",
-              "Assistant","Report Gen","Social Media","App Automation","Camera","ML","Business Utils"]:
+              "Assistant","Report Gen","Social Media","App Automation","Camera","ML","Business Utils","Tally ERP"]:
         st.markdown(f"- {t}")
 
     st.divider()

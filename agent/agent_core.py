@@ -34,6 +34,7 @@ from tools.document_ingestion_tool import DocumentIngestionTool
 from tools.camera_tool import CameraTool
 from tools.ml_tool import MLTool
 from tools.business_utils import BusinessUtilsTool
+from tools.tally_tool import TallyTool
 
 
 from memory.short_term_memory import ShortTermMemory
@@ -121,6 +122,7 @@ class AgentCore:
             CameraTool(),
             MLTool(),
             BusinessUtilsTool(),
+            TallyTool(),
         ]
 
         for tool in tools:
@@ -448,6 +450,10 @@ class AgentCore:
                 "merge data", "forecast", "forecasting", "kpi",
                 "business intelligence", "business report", "dashboard",
                 "pivot table", "gst", "inventory report", "stock report",
+                # Tally keywords
+                "tally", "ledger", "voucher", "balance sheet", "profit and loss",
+                "trial balance", "day book", "outstanding", "stock item",
+                "stock group", "cost centre", "godown", "accounting",
             ]
             looks_tool_request = any(k in normalized for k in tool_keywords)
 
